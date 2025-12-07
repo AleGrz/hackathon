@@ -15,10 +15,10 @@ faker = faker.Faker('pl_PL')
 nlp = spacy.load("pl_core_news_sm")
 morf = morfeusz2.Morfeusz()
 
-tokenizer = AutoTokenizer.from_pretrained(os.path.join("ppiRemover", "model", "model"))
+tokenizer = AutoTokenizer.from_pretrained("ajemalbatros/mewaBERT")
 ner_pipeline = pipeline(
     "token-classification",
-    model=os.path.join("ppiRemover", "model", "model"),
+    model="ajemalbatros/mewaBERT",
     tokenizer=tokenizer,
     device="cpu",
     aggregation_strategy="simple"
