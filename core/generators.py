@@ -1,5 +1,4 @@
 import random
-import faker
 
 sex = lambda: random.choice(["mężczyzna", "kobieta"])
 

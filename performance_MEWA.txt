@@ -3,9 +3,11 @@ Google Colab Nvidia T4 15gb vram
 
 Lokalne uruchomienie aplikcji:
 i7-10750H 32gb RAM (miałem problemy ze sterownikami do CUDA)
-Pojedynczy rekord z otrzymanego datasetu ewaluuje się około 400-700ms (sumarycznie dla klasyfikacji i zastępowania), w zależności od długości
+Pojedynczy rekord z otrzymanego datasetu ewaluuje się między 100-1000ms (sumarycznie dla klasyfikacji i zastępowania), w zależności od długości
 Należy jednak pamiętać, że jest to wynik na CPU, który znacząco polepszyłby się gdyby obliczenia były robione na GPU.
 
 API: planowane użycie do augmentacji datasetu, natomiast nie zostało ostatecznie użyte
 
 Model: jest to finetune `allegro/herBERT-large-cased`, wagi znajdują się na HuggingFace: `ajemalbatros/mewaBERT`.
+
+Total time: 259.7s - dla dane_final_test
