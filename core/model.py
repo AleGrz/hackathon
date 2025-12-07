@@ -1,5 +1,7 @@
+import os
 import random
 import re
+import time
 
 from transformers import AutoTokenizer, pipeline
 import morfeusz2
@@ -13,11 +15,12 @@ faker = faker.Faker('pl_PL')
 nlp = spacy.load("pl_core_news_sm")
 morf = morfeusz2.Morfeusz()
 
-tokenizer = AutoTokenizer.from_pretrained("ajemalbatros/mewaBERT")
+tokenizer = AutoTokenizer.from_pretrained(os.path.join("ppiRemover", "model", "model"))
 ner_pipeline = pipeline(
     "token-classification",
-    model="ajemalbatros/mewaBERT",
+    model=os.path.join("ppiRemover", "model", "model"),
     tokenizer=tokenizer,
+    device="cpu",
     aggregation_strategy="simple"
 )
 
@@ -53,17 +56,21 @@ def repair(text, ner):
     for e in ner:
         if e["entity_group"] != "0":
             safe_word = re.escape(e['word'])
-            text = re.sub(rf"[\w@]*{safe_word}[\w@]*", e["entity_group"], text)
+            text = re.sub(rf"[\w@]*{safe_word}[\w@.]*[\w@]*", e["entity_group"], text)
     return text
 
 
 def get_result(text):
+    t = time.time()
     res = ner_pipeline(text)
     word_metadata = get_metadata(text)
     cleaned = repair(text, res)
+    swapped = get_swapped(text, res, word_metadata)
+    dt = time.time() - t
+    print(f"Request was processed in {dt*1000:2f} ms ")
     return {
         "redacted": cleaned,
-        "swapped": get_swapped(text, res, word_metadata),
+        "swapped": swapped,
     }
 
 
@@ -73,10 +80,10 @@ inflective = {
     "[city]": lambda: faker.city(),
     "[sex]": generators.sex,
     "[religion]": generators.religion,
-    "[school-name]": generators.sexual_orientation,
+    "[school-name]": generators.school_name,
     "[sexual-orientation]": generators.sexual_orientation,
-    "[health]": generators.sexual_orientation,
-    "[relative]": generators.sexual_orientation,
+    "[health]": generators.health,
+    "[relative]": generators.relative,
     "[political-view]": generators.political_view,
     "[ethnicity]": generators.ethnicity,
 }
@@ -85,16 +92,16 @@ non_inflective = {
     "[phone]": lambda: faker.phone_number(),
     "[email]": lambda: faker.email(),
     "[pesel]": lambda: faker.pesel(),
-    "[document-number]": generators.sexual_orientation,
+    "[document-number]": faker.random_number(digits=10),
     "[company]": lambda: faker.company(),
     "[job-title]": lambda: faker.job(),
     "[bank-account]": lambda: faker.bank(),
     "[credit-card-number]": lambda: faker.credit_card_number(),
     "[username]": lambda: faker.user_name(),
     "[secret]": lambda: faker.password(),
-    "[age]": lambda: random.randrange(1, 99),
-    "[date-of-birth]": lambda: faker.date_of_birth(minimum_age=1, maximum_age=99),
-    "[date]": lambda: faker.past_date(),
+    "[age]": lambda: str(random.randrange(1, 99)),
+    "[date-of-birth]": lambda: faker.date_of_birth(minimum_age=1, maximum_age=99).strftime("%d-%m-%Y"),
+    "[date]": lambda: faker.past_date().strftime("%d-%m-%Y"),
     "[address]": lambda: faker.address(),
 }
 

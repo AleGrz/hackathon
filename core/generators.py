@@ -1,6 +1,5 @@
 import random
 import faker
-import morfeusz2
 
 sex = lambda: random.choice(["mężczyzna", "kobieta"])
 
@@ -20,23 +19,16 @@ health = lambda: random.choice([
     "astma",
     "nadciśnienie",
     "cukrzyca",
-    "ból pleców",
     "migrena",
     "depresja",
     "otyłość",
     "bezsenność",
     "artretyzm",
-    "niedoczynność tarczycy",
-    "choroba serca",
     "rak",
     "osteoporoza",
-    "kamica nerkowa",
-    "zespół jelita drażliwego",
     "anemia",
     "niedosłuch",
     "krótkowzroczność",
-    "choroba autoimmunologiczna",
-    "przewlekłe zmęczenie",
 ])
 
 school_name = lambda: random.choice([
@@ -79,17 +71,17 @@ school_name = lambda: random.choice([
     "Szkoła Aspirantów Państwowej Straży Pożarnej"
 ])
 
-faker = faker.Faker()
 
-def relative():
-    male_prepositions = []
-    female_prepositions = []
-    male_relatives = []
-    female_relatives = []
-    ch = random.random()
-    if ch < 0.25:
-        return random.choice(male_prepositions) + " " + random.choice(male_relatives)
-    elif ch < 0.5:
-        return random.choice(female_prepositions) + " " + random.choice(female_relatives)
+relative = lambda: random.choice([
+    'brat',
+    'ojciec',
+    'syn',
+    'dziadek',
+    'wujek',
+    'siostra',
+    'matka',
+    'córka',
+    'babcia',
+    'ciocia',
+])
 
-    return random.choice(male_prepositions + female_prepositions) + " " + faker.full_name()
