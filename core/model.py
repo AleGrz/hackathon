@@ -2,24 +2,22 @@ import random
 import re
 
 from transformers import AutoTokenizer, pipeline
-import os
 import morfeusz2
 import spacy
 import faker
 
-from ppiRemover import generators
+from core import generators
 
 faker = faker.Faker('pl_PL')
 
 nlp = spacy.load("pl_core_news_sm")
 morf = morfeusz2.Morfeusz()
 
-tokenizer = AutoTokenizer.from_pretrained(os.path.join("ppiRemover", "model"))
+tokenizer = AutoTokenizer.from_pretrained("ajemalbatros/mewaBERT")
 ner_pipeline = pipeline(
     "token-classification",
-    model=os.path.join("ppiRemover", "model"),
+    model="ajemalbatros/mewaBERT",
     tokenizer=tokenizer,
-    device=-1,
     aggregation_strategy="simple"
 )
 

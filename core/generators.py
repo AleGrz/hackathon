@@ -80,7 +80,6 @@ school_name = lambda: random.choice([
 ])
 
 faker = faker.Faker()
-morf = morfeusz2.Morfeusz()
 
 def relative():
     male_prepositions = []
