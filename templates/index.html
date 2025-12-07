@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    {% csrf_token %}
+    <meta charset="UTF-8"/>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Remove PPI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0ea5e9',
+                        secondary: '#8b5cf6',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis. com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(ellipse at top left, rgba(14, 165, 233, 0.15) 0%, transparent 50%),
+            radial-gradient(ellipse at bottom right, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+            #0a0a0a;
+            min-height: 100vh;
+        }
+
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .card {
+            background: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .card-light {
+            background: rgba(20, 20, 20, 0.3);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .btn {
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: rgba(30, 30, 30, 0.8);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary {
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .btn-primary:not(:disabled) {
+            background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #38bdf8 0%, #a78bfa 100%);
+        }
+
+        .btn-primary:disabled {
+            background: rgba(20, 20, 20, 0.3);
+            backdrop-filter: blur(16px);
+
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+
+        .tabs-container {
+            position: relative;
+            background: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 4px;
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .tab-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            height: calc(100% - 8px);
+            background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+        }
+
+        .tab {
+            position: relative;
+            z-index: 1;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            transition: color 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tab-active {
+            color: white;
+        }
+
+        .tab:hover:not(.tab-active) {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .input-glow:focus {
+            border-color: rgba(14, 165, 233, 0.4);
+            box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.2);
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+<div class="relative z-10 min-h-screen px-4 py-12 md:py-16">
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-12">
+            <h1 class="text-5xl md:text-6xl font-bold text-white mb-3">
+                Remove PPI
+            </h1>
+            <p class="text-lg text-gray-500">
+                Remove or randomize private personal information from text using AI
+            </p>
+        </header>
+
+        <div class="card rounded-3xl p-6 md:p-10 shadow-2xl">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="space-y-3">
+                    <div class="relative">
+              <textarea
+                      id="inputArea"
+                      class="w-full h-[500px] px-5 py-4 bg-black/40 border border-white/5 rounded-2xl text-gray-100 text-base placeholder-gray-600 outline-none resize-none input-glow transition-all duration-300 code-font"
+                      placeholder="Enter your text here..."
+              ></textarea>
+
+                        <div class="absolute bottom-4 right-4 tooltip-style px-3 py-1.5 rounded-lg">
+                            <span id="charCount" class="text-xs text-gray-500 code-font">0 chars</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="relative">
+              <div
+                      id="outputArea"
+                      class="w-full h-[500px] px-5 py-4 bg-black/40 border border-white/5 rounded-2xl text-gray-100 text-base outline-none resize-none code-font placeholder-gray-600"
+              >Your processed text will appear here...</div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-3">
+                    <button id="generateBtn" disabled class="btn-primary px-8 py-3 rounded-xl font-bold text-white">
+                        Generate
+                    </button>
+
+                    <button id="clearBtn" disabled
+                            class="btn card-light px-6 py-3 rounded-xl font-semibold text-gray-400 hover:text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed border border-transparent">
+                        Clear
+                    </button>
+                </div>
+
+                <div id="tabsContainer" class="hidden tabs-container">
+                    <div id="tabSlider" class="tab-slider"></div>
+                    <div id="tabRedacted" class="tab tab-active">
+                        REDACTED
+                    </div>
+                    <div id="tabSwapped" class="tab">
+                        SWAPPED
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const inputArea = document.getElementById('inputArea');
+    const outputArea = document.getElementById('outputArea');
+    const generateBtn = document.getElementById('generateBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const charCount = document.getElementById('charCount');
+    const tabsContainer = document.getElementById('tabsContainer');
+    const tabSlider = document.getElementById('tabSlider');
+    const tabRedacted = document.getElementById('tabRedacted');
+    const tabSwapped = document.getElementById('tabSwapped');
+
+    let currentMode = 'redacted';
+    let hasGenerated = false;
+    let lastInputValue = '';
+    let lastReceived;
+
+
+    function updateSliderPosition() {
+        const activeTab = currentMode === 'redacted' ? tabRedacted : tabSwapped;
+        const containerRect = tabsContainer.getBoundingClientRect();
+        const tabRect = activeTab.getBoundingClientRect();
+
+        tabSlider.style.width = `${tabRect.width}px`;
+        tabSlider.style.transform = `translateX(${tabRect.left - containerRect.left - 4}px)`;
+    }
+
+    function updateStats() {
+        const text = inputArea.value;
+        const chars = text.length;
+
+        charCount.textContent = `${chars} chars`;
+        const textChanged = text !== lastInputValue;
+        generateBtn.disabled = chars === 0 || (hasGenerated && !textChanged);
+        clearBtn.disabled = chars === 0;
+    }
+
+    function processCurrentMode() {
+        outputArea.innerHTML = currentMode === "redacted" ? lastReceived.redacted : lastReceived.swapped;
+    }
+
+    function pretty(res) {
+        return res.replaceAll('\[', '<span class="code-font" style="color: #0ea5e9">[').replaceAll('\]', ']</span>');
+    }
+
+    function generateText(res) {
+        if (inputArea.value.length === 0) return;
+
+        hasGenerated = true;
+        lastInputValue = inputArea.value;
+        tabsContainer.classList.remove('hidden');
+        res.redacted = pretty(res.redacted);
+        res.swapped = pretty(res.swapped);
+        lastReceived = res;
+        processCurrentMode();
+
+        generateBtn.disabled = true;
+        setTimeout(updateSliderPosition, 0);
+    }
+
+    function clearAll() {
+        inputArea.value = '';
+        outputArea.value = '';
+        hasGenerated = false;
+        lastInputValue = '';
+        updateStats();
+        tabsContainer.classList.add('hidden');
+        inputArea.focus();
+    }
+
+    function changeMode(mode) {
+        if (!hasGenerated) return;
+
+        currentMode = mode;
+
+        if (mode === 'redacted') {
+            tabRedacted.classList.add('tab-active');
+            tabSwapped.classList.remove('tab-active');
+        } else {
+            tabRedacted.classList.remove('tab-active');
+            tabSwapped.classList.add('tab-active');
+        }
+
+        updateSliderPosition();
+        processCurrentMode();
+    }
+
+    inputArea.addEventListener('input', updateStats);
+    generateBtn.addEventListener('click', () => {
+        fetch("/api/generate", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                "data": inputArea.value,
+            })
+        }).then(res => res.json()).then(res => generateText(res))
+    });
+    clearBtn.addEventListener('click', clearAll);
+
+    tabRedacted.addEventListener('click', () => changeMode('redacted'));
+    tabSwapped.addEventListener('click', () => changeMode('swapped'));
+
+    inputArea.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            if (!generateBtn.disabled) {
+                generateText();
+            }
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        if (!tabsContainer.classList.contains('hidden')) {
+            updateSliderPosition();
+        }
+    });
+
+    updateStats();
+</script>
+</body>
+</html>
